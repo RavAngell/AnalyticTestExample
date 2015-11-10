@@ -1,6 +1,7 @@
 package com.woac;
 
-import com.google.common.base.Function;
+import com.woac.pageobjects.GooglePage;
+import com.woac.utils.HarProcessor;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 import net.lightbody.bmp.client.ClientUtil;
@@ -14,9 +15,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.ui.FluentWait;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This is basic analytic test using Browsermob-proxy and Selenium WebDriver.
@@ -26,11 +25,13 @@ import java.util.concurrent.TimeUnit;
 public class AnalyticTest {
     private BrowserMobProxy proxy;
     private WebDriver driver;
+    private HarProcessor proxyLogsProcessor;
 
     @Before
     public void setUp() {
         this.proxy = startUpProxy();
         this.driver = configureWebDriverWithProxy(proxy);
+        this.proxyLogsProcessor = new HarProcessor(proxy);
     }
 
     /**
@@ -75,7 +76,7 @@ public class AnalyticTest {
                 .navigate() // Open google page
                 .searchFor(searchTerm); // Search for testing term
 
-        HarEntry entry = waitForRequestToAppear(searchTerm); // Wait for HAR log to contain expected token, or analytic string
+        HarEntry entry = proxyLogsProcessor.waitForRequestToAppear(searchTerm); // Wait for HAR log to contain expected token, or analytic string
 
         String actualRequestUrl = entry.getRequest().getUrl(),
                 expectedPartOfUrl = String.format("q=%s", searchTerm); // Verify that search parameter is as expected, q="automation"
@@ -83,24 +84,5 @@ public class AnalyticTest {
 
         Assert.assertTrue(String.format("Beacon was not as expected. Actual: %s, Expected: %s", actualRequestUrl, searchTerm),
                 actualRequestUrl.contains(expectedPartOfUrl));
-    }
-
-    /**
-     * Waits for specified token to appear in HAR log.
-     * @param token - specifies token / part of url to appear
-     * @return {@code HarEntry} - returns har entry that contains expected token
-     */
-    private HarEntry waitForRequestToAppear(String token) {
-        Function<BrowserMobProxy, HarEntry> searchFunc = prxy -> // This is about wait function
-                prxy.getHar().getLog().getEntries().stream()
-                        .filter(entry ->
-                                entry.getRequest().getUrl().contains(token)) // if some entry url contains expected token
-                        .findFirst().orElse(null); // return it or otherwise just return null, that will foster to wait longer
-
-        System.out.println(String.format("Waiting for request [%s] to appear in logs", token));
-        return new FluentWait<>(proxy)
-                .withTimeout(15L, TimeUnit.SECONDS)
-                .withMessage(String.format("Expected token [%s] did not appear in HarLog", token))
-                .until(searchFunc);
     }
 }
