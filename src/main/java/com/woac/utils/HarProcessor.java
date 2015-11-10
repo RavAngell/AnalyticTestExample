@@ -25,10 +25,10 @@ public class HarProcessor {
     public final HarEntry waitForRequestToAppear(String token) {
         Function<BrowserMobProxy, HarEntry> searchFunc = prxy -> // This is about wait function
                 prxy.getHar().getLog().getEntries().stream()
-                        .filter(entry ->
-                                entry.getRequest().getUrl().contains(token)) // if some entry url contains expected token
-                        .findFirst().orElse(null); // return it or otherwise just return null, that will foster to wait longer
-
+                        .filter(entry -> // If request contains expected token
+                                entry.getRequest().getUrl().contains(token))
+                        .findFirst().orElse(null); // return it or otherwise just return null,
+        // that will foster to wait longer
         System.out.println(String.format("Waiting for request [%s] to appear in logs", token));
         return new FluentWait<>(proxy)
                 .withTimeout(15L, TimeUnit.SECONDS)

@@ -35,7 +35,7 @@ to contain:
  <"q=automation3a80b6e8-72f0-4f59-a6ff-c7f89008678eABRACADABRA"> 
  ```
  
-# What the next?
+# What next?
 With this approach you can test and do a lot of interesting things besides web analytics testing. For example, you can 
 download file after pressing on 'Download' button if href attribute is not present in the DOM, but being retrieved via
 JavaScript.

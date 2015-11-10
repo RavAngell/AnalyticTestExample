@@ -6,7 +6,6 @@ import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 import net.lightbody.bmp.client.ClientUtil;
 import net.lightbody.bmp.core.har.HarEntry;
-import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,13 +75,13 @@ public class AnalyticTest {
         new GooglePage(driver)
                 .navigate() // Open google page
                 .searchFor(searchTerm); // Search for testing term
-
-        HarEntry entry = proxyLogsProcessor.waitForRequestToAppear(searchTerm); // Wait for HAR log to contain expected token, or analytic string
+        // Wait for HAR log to contain expected token, or analytic string
+        HarEntry entry = proxyLogsProcessor.waitForRequestToAppear(searchTerm);
 
         String actualRequestUrl = entry.getRequest().getUrl(),
-                expectedPartOfUrl = String.format("q=%s", searchTerm); // Verify that search parameter is as expected, q="automation"
-        // Note: Go further and describe your search term not in terms of String, but in terms of your DSL that will suits your business needs
-
+                expectedPartOfUrl = String.format("q=%s", searchTerm); // Search parameter: q="automation<SOMERANDUUID>"
+        // Note: Go further and describe your search term not in terms of String, but in terms of your DSL
+        // that will suits your business needs
         assertThat(actualRequestUrl)
                 .as("Search parameter in logs was not as expected")
                 .contains(expectedPartOfUrl);
