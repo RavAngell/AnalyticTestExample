@@ -1,0 +1,5 @@
+# Maven stuff
+target/ test-output/
+*.iml
+## Directory-based project format:
+.idea/
