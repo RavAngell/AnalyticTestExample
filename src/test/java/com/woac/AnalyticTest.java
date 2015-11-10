@@ -6,8 +6,8 @@ import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 import net.lightbody.bmp.client.ClientUtil;
 import net.lightbody.bmp.core.har.HarEntry;
+import org.assertj.core.api.Assertions;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.Proxy;
@@ -16,6 +16,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import java.util.UUID;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * This is basic analytic test using Browsermob-proxy and Selenium WebDriver.
@@ -82,7 +83,8 @@ public class AnalyticTest {
                 expectedPartOfUrl = String.format("q=%s", searchTerm); // Verify that search parameter is as expected, q="automation"
         // Note: Go further and describe your search term not in terms of String, but in terms of your DSL that will suits your business needs
 
-        Assert.assertTrue(String.format("Beacon was not as expected. Actual: %s, Expected: %s", actualRequestUrl, searchTerm),
-                actualRequestUrl.contains(expectedPartOfUrl));
+        assertThat(actualRequestUrl)
+                .as("Search parameter in logs was not as expected")
+                .contains(expectedPartOfUrl);
     }
 }
